@@ -13,11 +13,11 @@
 /* BIBLIOTECAS LOCALS */
 #include "libs/ssd1306.h" // Biblioteca para controle do display OLED SSD1306
 #include "libs/definicoes.h" // Definições de pinos e estruturas
-
+#include "credenciais.h" // Credenciais de rede Wi-Fi
 
 // Credenciais WIFI - Altere para sua rede
-#define WIFI_SSID "SUA REDE WIFI"
-#define WIFI_PASSWORD "SUA SENHA"
+//#define WIFI_SSID "SUA REDE WIFI"
+//#define WIFI_PASSWORD "SUA SENHA"
 
 // Definição das variáveis
 static volatile uint32_t last_time = 0; // Variável para armazenar o último tempo em microssegundos
@@ -342,15 +342,15 @@ void alert_lights()
 }
 
 uint16_t verify_luminosity(){
-    adc_select_input(1);
+    adc_select_input(ADC_CHANNEL);
     uint16_t adc_value = adc_read();
-    uint16_t luminosity = (adc_value * 100) / 4095; // Convertendo para porcentagem
+    uint16_t luminosity = (adc_value * 100) / MAX_ADC_VALUE; // Convertendo para porcentagem
     return luminosity;
     sleep_ms(100);
 }
 
 void control_lights(uint16_t luminosity_value){
-    if(luminosity_value < 30){
+    if(luminosity_value < 10){
         gpio_put(LED_BLUE_PIN, 1);
     } else {
         gpio_put(LED_BLUE_PIN, 0);
