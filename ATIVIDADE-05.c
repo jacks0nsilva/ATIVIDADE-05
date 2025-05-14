@@ -30,9 +30,8 @@ ssd1306_t ssd; // Struct para o display OLED
 
 
 // Definição dos pinos GPIO para acionamento dos LEDs e botões da BitDogLab
-PIN_GPIO gpio_bitdog[5] = {
+PIN_GPIO gpio_bitdog[4] = {
     {LED_BLUE_PIN, GPIO_OUT},
-    {LED_GREEN_PIN, GPIO_OUT},
     {LED_RED_PIN, GPIO_OUT},
     {BUTTON_A, GPIO_IN},
     {BUTTON_B, GPIO_IN}
@@ -135,7 +134,7 @@ int main()
     printf("Servidor ouvindo na porta 80\n");
 
     adc_init(); // Inicializa o conversor ADC
-    adc_gpio_init(27); // Eixo X do Joystick
+    adc_gpio_init(ADC_GPIO); // Eixo X do Joystick
 
     // Habilita interrupções para os botões A e B
     gpio_set_irq_enabled_with_callback(BUTTON_A, GPIO_IRQ_EDGE_FALL, true, &gpio_irq_handler);
