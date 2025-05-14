@@ -148,7 +148,7 @@ int main()
         if (controle_automatico) {
             control_lights(luminosity_value);
         } else {
-            gpio_put(gpio_bitdog[0].pin_gpio, luz_manual); 
+            gpio_put(LED_BLUE_PIN, luz_manual); 
         }
 
         char luminosity_convert[6];
@@ -181,7 +181,7 @@ int main()
 
 // Inicializar os Pinos GPIO para acionamento dos LEDs e botões da BitDogLab
 void init_gpio_bitdog(void){
-    for(int i = 0; i< 5; i++){
+    for(int i = 0; i< 4; i++){
         gpio_init(gpio_bitdog[i].pin_gpio);
         gpio_set_dir(gpio_bitdog[i].pin_gpio, gpio_bitdog[i].pin_dir);
 
@@ -332,11 +332,11 @@ void gpio_irq_handler(uint gpio, uint32_t events)
 void alert_lights()
 {
     if(alert){
-        gpio_put(gpio_bitdog[2].pin_gpio, true);
+        gpio_put(LED_RED_PIN, true);
         sleep_ms(500);
-        gpio_put(gpio_bitdog[2].pin_gpio, false);
+        gpio_put(LED_RED_PIN, false);
     } else{
-        gpio_put(gpio_bitdog[2].pin_gpio, false);
+        gpio_put(LED_RED_PIN, false);
     }
 }
 
