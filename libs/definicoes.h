@@ -9,9 +9,9 @@
 #define ADRESS 0x3c
 #define BUTTON_A 5
 #define BUTTON_B 6
-#define ADC_GPIO 28 // 27 para joystick e 28 para LDR
-#define ADC_CHANNEL 2 // Canal ADC (1 para eixo X, 2 para GPIO28 LDR)
-#define MAX_ADC_VALUE 3700 // Valor máximo do ADC  | 4095 para o joystick e 3700 para o LDR (O valor medido utilizando LDR pode sofrer variações dependendo da resistência utilizada)
+#define ADC_GPIO 27 // 27 para joystick e 28 para LDR
+#define ADC_CHANNEL 1 // Canal ADC (1 para eixo X, 2 para GPIO28 LDR)
+#define MAX_ADC_VALUE 4095 // Valor máximo do ADC  | 4095 para o joystick e 3700 para o LDR (O valor medido utilizando LDR pode sofrer variações dependendo da resistência utilizada)
 
 typedef struct
 {

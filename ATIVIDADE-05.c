@@ -236,7 +236,7 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
 
 
     // Cria a resposta HTML
-    char html[1024];
+    char html[2048]; 
     const char *bg_color = (alert ? "#fc8981" : "#f0f8ff"); // vermelho claro se alarme ativo
     // Instruções html do webserver
     snprintf(html, sizeof(html),
@@ -247,7 +247,6 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
     "<html>\n"
     "<head>\n"
     "<title>Residencia Inteligente</title>\n"
-    "<meta http-equiv=\"refresh\" content=\"5\">\n"
     "<style>\n"
     "body { font-family: Arial; text-align: center; background-color: %s; }\n"
     "h1 { color: #006400; }\n"
