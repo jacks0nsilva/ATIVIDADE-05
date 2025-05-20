@@ -2,8 +2,7 @@
 #include <string.h> // Biblioteca manipular strings
 #include <stdlib.h> // funções para realizar várias operações, incluindo alocação de memória dinâmica 
 #include "pico/stdlib.h"    // Biblioteca da Raspberry Pi Pico para funções padrão 
-#include "hardware/adc.h"   // Biblioteca da Raspberry Pi Pico para manipulação do conversor ADC
-#include "hardware/i2c.h"    // Biblioteca da Raspberry Pi Pico para comunicação I2C
+#include "hardware/adc.h"    // Biblioteca da Raspberry Pi Pico para manipulação do ADC
 #include "hardware/timer.h" // Biblioteca da Raspberry Pi Pico para manipulação de temporizadores
 #include "pico/cyw43_arch.h"    // Biblioteca para arquitetura Wi-Fi da Pico com CYW43  
 #include "lwip/pbuf.h"  // Lightweight IP stack - manipulação de buffers de pacotes de rede
@@ -14,6 +13,7 @@
 #include "libs/ssd1306.h" // Biblioteca para controle do display OLED SSD1306
 #include "libs/definicoes.h" // Definições de pinos e estruturas
 #include "credenciais.h" // Credenciais de rede Wi-Fi
+#include "libs/funcoes.h" // Funções auxiliares para controle de LEDs e leitura de ADC
 
 // Credenciais WIFI - Altere para sua rede
 //#define WIFI_SSID "SUA REDE WIFI"
@@ -37,10 +37,10 @@ PIN_GPIO gpio_bitdog[4] = {
     {BUTTON_B, GPIO_IN}
 };
 
-/*DECLRAÇÃO DAS FUNÇÕES */
+// DECLRAÇÃO DAS FUNÇÕES 
 
-// Inicializar os Pinos GPIO para acionamento dos LEDs da BitDogLab
-void init_gpio_bitdog(void); 
+// Inicializa os Pinos GPIO para acionamento dos LEDs e botões da BitDogLab
+void init_gpio_bitdog(); 
 
 // Função de callback ao aceitar conexões TCP
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *newpcb, err_t err); 
@@ -51,21 +51,9 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
 // Tratamento do request do usuário
 void user_request(char **request); 
 
-// Inicializa o display OLED
-void init_display(); 
 
 // Função de interrupção para os botões
 void gpio_irq_handler(uint gpio, uint32_t events); 
-
-// Função para acender o LED vermelho quando o alarme estiver ativo
-void alert_lights(); 
-
-// Função para verificar a luminosidade
-uint16_t verify_luminosity(); 
-
-// Função para controlar as luzes do jardim com base na luminosidade
-void control_lights(uint16_t luminosity_value); 
-
 
 // Função principal
 int main()
@@ -73,11 +61,13 @@ int main()
     //Inicializa todos os tipos de bibliotecas stdio padrão presentes que estão ligados ao binário.
     stdio_init_all();
 
-    // Inicializar os Pinos GPIO para acionamento dos LEDs da BitDogLab
-    init_gpio_bitdog();
+    // Inicializa os Pinos GPIO para acionamento dos LEDs da BitDogLab
+    init_gpio_bitdog(); 
 
     // Inicializa o display OLED
-    init_display(); 
+    init_display(&ssd); 
+
+    pwm_init_buzzer(BUZZER_A); // Inicializa o buzzer
 
     //Inicializa a arquitetura do cyw43
     while (cyw43_arch_init())
@@ -167,7 +157,7 @@ int main()
 
         ssd1306_send_data(&ssd);
 
-        alert_lights();
+        alert_lights(alert);
         cyw43_arch_poll(); // Necessário para manter o Wi-Fi ativo
         sleep_ms(1000);      // Reduz o uso da CPU
     }
@@ -179,20 +169,6 @@ int main()
 
 // -------------------------------------- Funções ---------------------------------
 
-// Inicializar os Pinos GPIO para acionamento dos LEDs e botões da BitDogLab
-void init_gpio_bitdog(void){
-    for(int i = 0; i< 4; i++){
-        gpio_init(gpio_bitdog[i].pin_gpio);
-        gpio_set_dir(gpio_bitdog[i].pin_gpio, gpio_bitdog[i].pin_dir);
-
-        if(gpio_bitdog[i].pin_dir == GPIO_IN){
-            gpio_pull_up(gpio_bitdog[i].pin_gpio);
-        }
-        else{
-            gpio_put(gpio_bitdog[i].pin_gpio, false);
-        }
-    }
-}
 
 // Função de callback ao aceitar conexões TCP
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
@@ -345,21 +321,6 @@ luminosity_value,
     return ERR_OK;
 }
 
-void init_display()
-{
-    i2c_init(I2C_PORT, 400 * 1000);
-    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    gpio_pull_up(I2C_SDA);
-    gpio_pull_up(I2C_SCL);
-
-    ssd1306_init(&ssd, WIDTH, HEIGHT, false, ADRESS, I2C_PORT);
-    ssd1306_config(&ssd);
-    ssd1306_fill(&ssd, false);
-
-    ssd1306_send_data(&ssd);
-}
-
 void gpio_irq_handler(uint gpio, uint32_t events)
 {
     uint32_t current_time = to_us_since_boot(get_absolute_time());
@@ -378,30 +339,16 @@ void gpio_irq_handler(uint gpio, uint32_t events)
     }
 }
 
+void init_gpio_bitdog(){
+    for(int i = 0; i< 4; i++){
+        gpio_init(gpio_bitdog[i].pin_gpio);
+        gpio_set_dir(gpio_bitdog[i].pin_gpio, gpio_bitdog[i].pin_dir);
 
-void alert_lights()
-{
-    if(alert){
-        gpio_put(LED_RED_PIN, true);
-        sleep_ms(500);
-        gpio_put(LED_RED_PIN, false);
-    } else{
-        gpio_put(LED_RED_PIN, false);
-    }
-}
-
-uint16_t verify_luminosity(){
-    adc_select_input(ADC_CHANNEL); // Seleciona o canal ADC
-    uint16_t adc_value = adc_read();
-    uint16_t luminosity = (adc_value * 100) / MAX_ADC_VALUE; // Convertendo para porcentagem
-    return luminosity;
-    sleep_ms(100);
-}
-
-void control_lights(uint16_t luminosity_value){
-    if(luminosity_value < 10){
-        gpio_put(LED_BLUE_PIN, 1);
-    } else {
-        gpio_put(LED_BLUE_PIN, 0);
+        if(gpio_bitdog[i].pin_dir == GPIO_IN){
+            gpio_pull_up(gpio_bitdog[i].pin_gpio);
+        }
+        else{
+            gpio_put(gpio_bitdog[i].pin_gpio, false);
+        }
     }
 }
