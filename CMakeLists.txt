@@ -51,8 +51,6 @@ target_link_libraries(${PROJECT_NAME}
         hardware_adc
         pico_cyw43_arch_lwip_threadsafe_background
         hardware_i2c
-        FreeRTOS-Kernel 
-        FreeRTOS-Kernel-Heap4
         hardware_pwm
         )
 
