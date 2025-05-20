@@ -21,7 +21,7 @@
 
 // Definição das variáveis
 static volatile uint32_t last_time = 0; // Variável para armazenar o último tempo em microssegundos
-static volatile bool alert = false; // Alerta geral
+static volatile bool alert_general = false; // Alerta geral
 static volatile bool alert_1, alert_2 = false; // Alerta 1 e Alerta 2
 bool controle_automatico = true; // Controle automático (fotorresistor) das luzes
 bool luz_manual = false; // Acionamento manual das luzes
@@ -158,7 +158,7 @@ int main()
 
         ssd1306_send_data(&ssd);
 
-        alert_lights(alert);
+        alert_lights(alert_general);
         cyw43_arch_poll(); // Necessário para manter o Wi-Fi ativo
         sleep_ms(1000);      // Reduz o uso da CPU
     }
@@ -184,6 +184,11 @@ void user_request(char **request){
         controle_automatico = !controle_automatico;
     } else if (strstr(*request, "GET /toggle_light") != NULL) {
         luz_manual = !luz_manual;
+    }
+    else if (strstr(*request, "GET /toggle_alarm") != NULL) {
+        alert_1 = false;
+        alert_2 = false;
+        alert_general = false;
     }
 }
 
@@ -212,7 +217,7 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
 
 // Cria a resposta HTML
 char html[4000];
-const char *bg_color = (alert ? "#ed1c05" : "#f0f8ff"); // vermelho claro se alarme ativo
+const char *bg_color = (alert_general ? "#ed1c05" : "#f0f8ff"); // vermelho claro se alarme ativo
 
 snprintf(html, sizeof(html),
 "HTTP/1.1 200 OK\r\n"
@@ -287,6 +292,7 @@ snprintf(html, sizeof(html),
 "<div class=\"status\">Alarme 2: <span style=\"color:%s; font-weight:bold;\">%s</span></div>\n"
 "<div class=\"button-group\">\n"
 "<form action=\"/toggle_auto\"><button class=\"auto-btn\">%s modo automático</button></form>\n"
+"<form action=\"/toggle_alarm\"><button class=\"auto-btn\">Desativar alarmes</button></form>\n"
 "<form action=\"/toggle_light\"><button class=\"light-btn\">%s luz manual</button></form>\n"
 "</div>\n"
 "</div>\n"
@@ -333,7 +339,7 @@ void gpio_irq_handler(uint gpio, uint32_t events)
         }
 
         // Alerta geral é ativado se qualquer um estiver ativo
-        alert = alert_1 || alert_2;
+        alert_general = alert_1 || alert_2;
     }
 }
 
