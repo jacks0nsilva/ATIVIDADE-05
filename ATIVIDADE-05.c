@@ -146,14 +146,15 @@ int main()
 
 
         ssd1306_fill(&ssd, false);
-        ssd1306_draw_string(&ssd, "Luz: ", 0, 1);
-        ssd1306_draw_string(&ssd, luminosity_convert, 40, 1);
+        ssd1306_rect(&ssd,0,0, WIDTH, HEIGHT, true, false); // Desenha o contorno do display
+        ssd1306_draw_string(&ssd, "Luz: ", 4, 3);
+        ssd1306_draw_string(&ssd, luminosity_convert, 44, 3);
 
-        ssd1306_draw_string(&ssd, "Alerta 1:", 0, 9);
-        ssd1306_draw_string(&ssd, alert_1 ? "ATIVO" : "INATIVO", 80, 9);
+        ssd1306_draw_string(&ssd, "Alerta 1:", 4, 14);
+        ssd1306_draw_string(&ssd, alert_1 ? "ON" : "OFF", 84, 17);
 
-        ssd1306_draw_string(&ssd, "Alerta 2:", 0, 25);
-        ssd1306_draw_string(&ssd, alert_2 ? "ATIVO" : "INATIVO", 80, 25);
+        ssd1306_draw_string(&ssd, "Alerta 2:", 4, 27);
+        ssd1306_draw_string(&ssd, alert_2 ? "ON" : "OFF", 84, 29);
 
         ssd1306_send_data(&ssd);
 
@@ -225,7 +226,7 @@ snprintf(html, sizeof(html),
 "<meta charset=\"UTF-8\">\n"
 "<title>Residência Inteligente</title>\n"
 "<script defer>\n"
-"setInterval(function(){location.reload();},8000);\n"
+"setInterval(function(){location.href='/';},2000);\n"
 "</script>\n"
 "<style>\n"
 "body {\n"
