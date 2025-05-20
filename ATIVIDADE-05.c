@@ -12,7 +12,6 @@
 /* BIBLIOTECAS LOCALS */
 #include "libs/ssd1306.h" // Biblioteca para controle do display OLED SSD1306
 #include "libs/definicoes.h" // Definições de pinos e estruturas
-#include "credenciais.h" // Credenciais de rede Wi-Fi
 #include "libs/funcoes.h" // Funções auxiliares para controle de LEDs e leitura de ADC
 
 // Credenciais WIFI - Altere para sua rede
