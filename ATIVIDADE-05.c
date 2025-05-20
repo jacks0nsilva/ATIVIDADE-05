@@ -135,7 +135,7 @@ int main()
     printf("Servidor ouvindo na porta 80\n");
 
     adc_init(); // Inicializa o conversor ADC
-    adc_gpio_init(27); // Eixo X do Joystick
+    adc_gpio_init(ADC_GPIO); // Eixo X do Joystick
 
     // Habilita interrupções para os botões A e B
     gpio_set_irq_enabled_with_callback(BUTTON_A, GPIO_IRQ_EDGE_FALL, true, &gpio_irq_handler);
