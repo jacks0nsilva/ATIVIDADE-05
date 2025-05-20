@@ -16,8 +16,8 @@
 #include "libs/funcoes.h" // Funções auxiliares para controle de LEDs e leitura de ADC
 
 // Credenciais WIFI - Altere para sua rede
-//#define WIFI_SSID "SUA REDE WIFI"
-//#define WIFI_PASSWORD "SUA SENHA"
+#define WIFI_SSID "SUA REDE WIFI"
+#define WIFI_PASSWORD "SUA SENHA"
 
 // Definição das variáveis
 static volatile uint32_t last_time = 0; // Variável para armazenar o último tempo em microssegundos
