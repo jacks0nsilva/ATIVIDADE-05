@@ -180,9 +180,7 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 
 // Tratamento do request do usuário - digite aqui
 void user_request(char **request){
-    if (strstr(*request, "GET /update") != NULL) {
-        // Apenas atualiza a página
-    } else if (strstr(*request, "GET /toggle_auto") != NULL) {
+ if (strstr(*request, "GET /toggle_auto") != NULL) {
         controle_automatico = !controle_automatico;
     } else if (strstr(*request, "GET /toggle_light") != NULL) {
         luz_manual = !luz_manual;
@@ -288,7 +286,6 @@ snprintf(html, sizeof(html),
 "<div class=\"status\">Alarme 1: <span style=\"color:%s; font-weight:bold;\">%s</span></div>\n"
 "<div class=\"status\">Alarme 2: <span style=\"color:%s; font-weight:bold;\">%s</span></div>\n"
 "<div class=\"button-group\">\n"
-"<form action=\".update\"><button class=\"update-btn\">Atualizar</button></form>\n"
 "<form action=\"/toggle_auto\"><button class=\"auto-btn\">%s modo automático</button></form>\n"
 "<form action=\"/toggle_light\"><button class=\"light-btn\">%s luz manual</button></form>\n"
 "</div>\n"
