@@ -12,12 +12,11 @@
 /* BIBLIOTECAS LOCALS */
 #include "libs/ssd1306.h" // Biblioteca para controle do display OLED SSD1306
 #include "libs/definicoes.h" // Definições de pinos e estruturas
-#include "credenciais.h" // Credenciais de rede Wi-Fi
 #include "libs/funcoes.h" // Funções auxiliares para controle de LEDs e leitura de ADC
 
 // Credenciais WIFI - Altere para sua rede
-//#define WIFI_SSID "SUA REDE WIFI"
-//#define WIFI_PASSWORD "SUA SENHA"
+#define WIFI_SSID "SUA REDE WIFI"
+#define WIFI_PASSWORD "SUA SENHA"
 
 // Definição das variáveis
 static volatile uint32_t last_time = 0; // Variável para armazenar o último tempo em microssegundos
