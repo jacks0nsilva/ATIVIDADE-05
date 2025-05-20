@@ -235,50 +235,100 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
     
 
 
-    // Cria a resposta HTML
-    char html[1024];
-    const char *bg_color = (alert ? "#fc8981" : "#f0f8ff"); // vermelho claro se alarme ativo
-    // Instruções html do webserver
-    snprintf(html, sizeof(html),
-    "HTTP/1.1 200 OK\r\n"
-    "Content-Type: text/html\r\n"
-    "\r\n"
-    "<!DOCTYPE html>\n"
-    "<html>\n"
-    "<head>\n"
-    "<title>Residencia Inteligente</title>\n"
-    "<meta http-equiv=\"refresh\" content=\"5\">\n"
-    "<style>\n"
-    "body { font-family: Arial; text-align: center; background-color: %s; }\n"
-    "h1 { color: #006400; }\n"
-    ".status { font-size: 24px; margin: 20px; }\n"
-    ".luminosity { font-size: 48px; color: %s; }\n"
-    "form { display: inline-block; margin: 10px; }\n"
-    "button { padding: 10px 20px; font-size: 16px; cursor: pointer; }\n"
-    "</style>\n"
-    "</head>\n"
-    "<body>\n"
-    "<h1>Residencia Inteligente</h1>\n"
-    "<div class=\"luminosity\">Luminosidade: %d%%</div>\n"
-    "<div class=\"status\">Modo: %s</div>\n"
-    "<div class=\"status\">Luzes do jardim: %s</div>\n"
-    "<div class=\"status\">Alarme 1: <span style=\"color:%s;\">%s</span></div>\n"
-    "<div class=\"status\">Alarme 2: <span style=\"color:%s;\">%s</span></div>\n"
-    "<form action=\".update\"><button>Atualizar</button></form>\n"
-    "<form action=\"/toggle_auto\"><button>%s Controle Automatico</button></form>\n"
-    "<form action=\"/toggle_light\"><button>%s Luz Manual</button></form>\n"
-    "</body>\n"
-    "</html>",
-    bg_color,
-    (luminosity_value < 30 ? "red" : "green"),
-    luminosity_value,
-    (controle_automatico ? "Automatico" : "Manual"),
-    (controle_automatico ? (luminosity_value < 30 ? "LIGADAS" : "DESLIGADAS") : (luz_manual ? "LIGADAS" : "DESLIGADAS")),
-    (alert_1 ? "red" : "green"), (alert_1 ? "ATIVADO" : "DESATIVADO"),
-    (alert_2 ? "red" : "green"), (alert_2 ? "ATIVADO" : "DESATIVADO"),
-    (controle_automatico ? "Desativar" : "Ativar"),
-    (luz_manual ? "Desligar" : "Ligar")
-    );
+// Cria a resposta HTML
+char html[4000];
+const char *bg_color = (alert ? "#ed1c05" : "#f0f8ff"); // vermelho claro se alarme ativo
+
+snprintf(html, sizeof(html),
+"HTTP/1.1 200 OK\r\n"
+"Content-Type: text/html\r\n"
+"\r\n"
+"<!DOCTYPE html>\n"
+"<html>\n"
+"<head>\n"
+"<meta charset=\"UTF-8\">\n"
+"<title>Residência Inteligente</title>\n"
+"<script defer>\n"
+"setInterval(function(){location.reload();},8000);\n"
+"</script>\n"
+"<style>\n"
+"body {\n"
+"    font-family: Arial, sans-serif;\n"
+"    text-align: center;\n"
+"    background-color: %s;\n"
+"    margin: 0;\n"
+"    padding: 0;\n"
+"}\n"
+"h1 {\n"
+"    color: #006400;\n"
+"    margin-top: 20px;\n"
+"}\n"
+".container {\n"
+"    max-width: 600px;\n"
+"    margin: auto;\n"
+"    background: #ffffffcc;\n"
+"    padding: 20px;\n"
+"    border-radius: 15px;\n"
+"    box-shadow: 0 0 15px rgba(0,0,0,0.2);\n"
+"}\n"
+".status {\n"
+"    font-size: 20px;\n"
+"    margin: 15px 0;\n"
+"}\n"
+".luminosity {\n"
+"    font-size: 40px;\n"
+"    color: %s;\n"
+"}\n"
+".button-group {\n"
+"    margin-top: 20px;\n"
+"}\n"
+"form {\n"
+"    display: inline-block;\n"
+"    margin: 10px;\n"
+"}\n"
+"button {\n"
+"    padding: 12px 24px;\n"
+"    font-size: 16px;\n"
+"    border: none;\n"
+"    border-radius: 8px;\n"
+"    cursor: pointer;\n"
+"    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);\n"
+"}\n"
+"button:hover {\n"
+"    opacity: 0.9;\n"
+"}\n"
+".update-btn { background-color: #4682B4; color: white; }\n"
+".auto-btn { background-color: #20B2AA; color: white; }\n"
+".light-btn { background-color: #FFD700; color: black; }\n"
+"</style>\n"
+"</head>\n"
+"<body>\n"
+"<div class=\"container\">\n"
+"<h1>Residência Inteligente</h1>\n"
+"<div class=\"luminosity\">Luminosidade: %d%%</div>\n"
+"<div class=\"status\">Modo: %s</div>\n"
+"<div class=\"status\">Luzes do jardim: %s</div>\n"
+"<div class=\"status\">Alarme 1: <span style=\"color:%s; font-weight:bold;\">%s</span></div>\n"
+"<div class=\"status\">Alarme 2: <span style=\"color:%s; font-weight:bold;\">%s</span></div>\n"
+"<div class=\"button-group\">\n"
+"<form action=\".update\"><button class=\"update-btn\">Atualizar</button></form>\n"
+"<form action=\"/toggle_auto\"><button class=\"auto-btn\">%s modo automático</button></form>\n"
+"<form action=\"/toggle_light\"><button class=\"light-btn\">%s luz manual</button></form>\n"
+"</div>\n"
+"</div>\n"
+"</body>\n"
+"</html>",
+bg_color,
+(luminosity_value < 10 ? "red" : "green"),
+luminosity_value,
+(controle_automatico ? "Automático" : "Manual"),
+(controle_automatico ? (luminosity_value < 10 ? "LIGADAS" : "DESLIGADAS") : (luz_manual ? "LIGADAS" : "DESLIGADAS")),
+(alert_1 ? "red" : "green"), (alert_1 ? "ATIVADO" : "DESATIVADO"),
+(alert_2 ? "red" : "green"), (alert_2 ? "ATIVADO" : "DESATIVADO"),
+(controle_automatico ? "Desativar" : "Ativar"),
+(luz_manual ? "Desligar" : "Ligar")
+);
+
     
     // Escreve dados para envio (mas não os envia imediatamente).
     tcp_write(tpcb, html, strlen(html), TCP_WRITE_FLAG_COPY);
@@ -341,7 +391,7 @@ void alert_lights()
 }
 
 uint16_t verify_luminosity(){
-    adc_select_input(ADC_CHANNEL);
+    adc_select_input(ADC_CHANNEL); // Seleciona o canal ADC
     uint16_t adc_value = adc_read();
     uint16_t luminosity = (adc_value * 100) / MAX_ADC_VALUE; // Convertendo para porcentagem
     return luminosity;
